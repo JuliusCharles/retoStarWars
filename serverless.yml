@@ -4,7 +4,88 @@ frameworkVersion: '3'
 provider:
   name: aws
   runtime: nodejs18.x
+  region: us-east-1
+  environment:
+    DYNAMODB_TABLE: peopleStartWars
+    SWAPI_URL: https://swapi.py4e.com/api/people/
+
+plugins:
+  - serverless-offline
+  - serverless-dynamodb-local
+  - serverless-aws-documentation
+
+custom:
+  dynamodb:
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+    stages:
+      - local
+  documentation:
+    api:
+      info:
+        title: My API
+        version: 1.0.0
+    openApiVersion: 3.0.3     
 
 functions:
-  function1:
-    handler: index.handler
+  api:
+    handler: src/index.handler
+    events:
+      - http:
+          path: /
+          method: GET
+
+  getProxyPeopleFindById:
+    handler: src/endpoint/get/getPeopleFindById.handler
+    events:
+      - http:
+          path: /people/{id}
+          method: GET
+
+  getProxyPeopleAll:
+    handler: src/endpoint/get/getPeopleAll.handler
+    events:
+      - http:
+          path: /people
+          method: GET
+
+  getDataBasePeopleFindById:
+    handler: src/endpoint/get/getDBPeopleFindById.handler
+    events:
+      - http:
+          path: /db/people/{id}
+          method: GET
+
+  getDataBasePeopleAll:
+    handler: src/endpoint/get/getDBPeopleAll.handler
+    events:
+      - http:
+          path: /db/people
+          method: GET   
+
+  addPeople:
+    handler: src/endpoint/add/addPeople.handler
+    timeout: 10
+    events:
+      - http:
+          path: /people/add
+          method: POST
+
+
+resources:
+  Resources:
+    MyDynamoDbTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: peopleStartWars
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
