@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "serverless-dynamodb-local": "^0.2.40",
+    "serverless-offline": "^12.0.4",
+    "swagger-ui-express": "^5.0.0"
+  },
+  "devDependencies": {
+    "serverless-aws-documentation": "^1.1.0",
+    "swagger-jsdoc": "^6.2.8"
+  }
+}
